@@ -1,0 +1,52 @@
+<style>
+#transcribed
+		{
+		padding:10%;
+}
+		
+</style>
+<form id="uploadForm">
+  <input type="file" id="audioFileInput" name="audioFile">
+  <button type="submit">Upload</button>
+</form>
+</div>
+<div id="transcribed">
+		<p id="text">placeholder</p>
+</div>
+
+
+				<script>
+						document.getElementById('uploadForm').addEventListener('submit', function(event) {
+  event.preventDefault(); // Prevent form submission
+
+  var form = document.getElementById('uploadForm');
+  var fileInput = document.getElementById('audioFileInput');
+  var formData = new FormData(form);
+
+  fetch('/audiofile', {
+    method: 'POST',
+    body: formData
+  })
+  .then(function(response) {
+    return response.text();
+  })
+  .then(function(data) {
+    // Handle response from the server
+
+	console.log('test=>'+data);
+	//text.innerText=data.message;
+  	const filteredText = data.replace(/\[\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\]/, '');
+  text.innerText=filteredText;
+
+  })
+  .catch(function(error) {
+    console.error('Error:', error);
+  }).finally(() => {
+    // Perform an action while waiting for the response
+
+
+    console.log('Waiting for response...');
+  });
+});
+
+				</script>
