@@ -6,7 +6,7 @@
 		
 </style>
 <form id="uploadForm">
-  <input type="file" id="audioFileInput" name="audioFile">
+  <input type="file" id="audioFileInput" name="audioFile" accept=".wav" pattern=".*\.wav" title="Please select a .wav file" required><br>
 <select id="fileDropdown"></select>
   <button type="submit">Upload</button>
 </form>
@@ -39,6 +39,17 @@
   var form = document.getElementById('uploadForm');
   var fileInput = document.getElementById('audioFileInput');
 const selectedFile = document.getElementById('fileDropdown').value;
+   const uploadedFile = fileInput.files[0];
+
+      if (!uploadedFile) {
+        console.log('Please select a file');
+        return;
+      }
+
+      if (!validateFileExtension(uploadedFile, 'wav')) {
+        console.log('Please select a valid .wav file');
+        return;
+      }
   var formData = new FormData(form);
   formData.append('selectedFile', selectedFile);
 
@@ -66,6 +77,11 @@ const selectedFile = document.getElementById('fileDropdown').value;
 
     console.log('Waiting for response...');
   });
+function validateFileExtension(file, extension) {
+      const allowedExtensions = new RegExp(`.${extension}$`, 'i');
+      return allowedExtensions.test(file.name);
+    }
+
 });
 
 				</script>
