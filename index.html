@@ -16,9 +16,11 @@
 
 
 				<script>
+          var text=document.getElementById('text');
+         
 						document.getElementById('uploadForm').addEventListener('submit', function(event) {
   event.preventDefault(); // Prevent form submission
-
+ text.innerHTML='loading';
   var form = document.getElementById('uploadForm');
   var fileInput = document.getElementById('audioFileInput');
   var formData = new FormData(form);
