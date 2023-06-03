@@ -1,14 +1,42 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-
+const fs = require('fs');
 const { spawn } = require('child_process');
 const multer = require('multer');
 // Configure storage options
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/getfile', (req, res) => {
+  const directoryPath = './whisper.cpp/models/';
+  const extension = '.bin';
 
+  getFilesWithExtension(directoryPath, extension)
+    .then((files) => {
+      res.json({ files });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+function getFilesWithExtension(directoryPath, extension) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(directoryPath, (err, files) => {
+      if (err) {
+        reject(err);
+      } else {
+        const filteredFiles = files.filter((file) => {
+          const fileExtension = path.extname(file);
+          return fileExtension === extension;
+        });
+        resolve(filteredFiles);
+      }
+    });
+  });
+}
 // Configure storage options
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -16,10 +44,11 @@ const upload = multer({ storage: storage });
 // Handle file upload
 app.post('/audiofile', upload.single('audioFile'), (req, res) => {
   const fileData = req.file.buffer; // Get the file data from the request
-
   // Run the external program with file data
+  const selectedFile = req.body.selectedFile;
+  console.log("selected file is"+selectedFile)
   const command = './whisper.cpp/main';
-  const args = ['-f', '-','-m','./whisper.cpp/models/ggml-tiny.en.bin_q4_0']; // Use '-' to represent stdin as the file argument
+  const args = ['-f', '-','-m','./whisper.cpp/models/'+selectedFile]; // Use '-' to represent stdin as the file argument
 
   // Create a child process
   //const child = spawn(command, args);

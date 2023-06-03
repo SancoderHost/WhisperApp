@@ -7,6 +7,7 @@
 </style>
 <form id="uploadForm">
   <input type="file" id="audioFileInput" name="audioFile">
+<select id="fileDropdown"></select>
   <button type="submit">Upload</button>
 </form>
 </div>
@@ -16,14 +17,30 @@
 
 
 				<script>
+
+           fetch('/getfile')
+      .then(response => response.json())
+      .then(data => {
+        const fileDropdown = document.getElementById('fileDropdown');
+
+        data.files.forEach(file => {
+          const option = document.createElement('option');
+          option.text = file;
+          fileDropdown.add(option);
+        });
+      })
+      .catch(error => console.error(error));
+
           var text=document.getElementById('text');
          
-						document.getElementById('uploadForm').addEventListener('submit', function(event) {
+	document.getElementById('uploadForm').addEventListener('submit', function(event) {
   event.preventDefault(); // Prevent form submission
  text.innerHTML='loading';
   var form = document.getElementById('uploadForm');
   var fileInput = document.getElementById('audioFileInput');
+const selectedFile = document.getElementById('fileDropdown').value;
   var formData = new FormData(form);
+  formData.append('selectedFile', selectedFile);
 
   fetch('/audiofile', {
     method: 'POST',
