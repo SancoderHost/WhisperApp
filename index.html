@@ -1,87 +1,86 @@
 <style>
-#transcribed
-		{
-		padding:10%;
-}
-		
+  #transcribed {
+    padding: 10%;
+  }
 </style>
 <form id="uploadForm">
-  <input type="file" id="audioFileInput" name="audioFile" accept=".wav" pattern=".*\.wav" title="Please select a .wav file" required><br>
-<select id="fileDropdown"></select>
+  <input type="file" id="audioFileInput" name="audioFile" accept=".wav" pattern=".*\.wav"
+    title="Please select a .wav file" required><br>
+  <select id="fileDropdown"></select>
   <button type="submit">Upload</button>
 </form>
 </div>
 <div id="transcribed">
-		<p id="text">placeholder</p>
+  <p id="text">placeholder</p>
 </div>
 
 
-				<script>
+<script>
 
-           fetch('/getfile')
-      .then(response => response.json())
-      .then(data => {
-        const fileDropdown = document.getElementById('fileDropdown');
+  fetch('/getfile')
+    .then(response => response.json())
+    .then(data => {
+      const fileDropdown = document.getElementById('fileDropdown');
 
-        data.files.forEach(file => {
-          const option = document.createElement('option');
-          option.text = file;
-          fileDropdown.add(option);
-        });
+      data.files.forEach(file => {
+        const option = document.createElement('option');
+        option.text = file;
+        fileDropdown.add(option);
+      });
+    })
+    .catch(error => console.error(error));
+
+  var text = document.getElementById('text');
+
+  document.getElementById('uploadForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent form submission
+    text.innerHTML = 'loading';
+    var form = document.getElementById('uploadForm');
+    var fileInput = document.getElementById('audioFileInput');
+    const selectedFile = document.getElementById('fileDropdown').value;
+    const uploadedFile = fileInput.files[0];
+
+    if (!uploadedFile) {
+      console.log('Please select a file');
+      return;
+    }
+
+    if (!validateFileExtension(uploadedFile, 'wav')) {
+      console.log('Please select a valid .wav file');
+      return;
+    }
+    var formData = new FormData(form);
+    formData.append('selectedFile', selectedFile);
+
+    fetch('/audiofile', {
+      method: 'POST',
+      body: formData
+    })
+      .then(function (response) {
+        return response.text();
       })
-      .catch(error => console.error(error));
+      .then(function (data) {
+        // Handle response from the server
 
-          var text=document.getElementById('text');
-         
-	document.getElementById('uploadForm').addEventListener('submit', function(event) {
-  event.preventDefault(); // Prevent form submission
- text.innerHTML='loading';
-  var form = document.getElementById('uploadForm');
-  var fileInput = document.getElementById('audioFileInput');
-const selectedFile = document.getElementById('fileDropdown').value;
-   const uploadedFile = fileInput.files[0];
+        console.log('test=>' + data);
+        //text.innerText=data.message;
+        const filteredText = data.replace(/\[\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\]/, '');
+        text.innerText = filteredText;
 
-      if (!uploadedFile) {
-        console.log('Please select a file');
-        return;
-      }
-
-      if (!validateFileExtension(uploadedFile, 'wav')) {
-        console.log('Please select a valid .wav file');
-        return;
-      }
-  var formData = new FormData(form);
-  formData.append('selectedFile', selectedFile);
-
-  fetch('/audiofile', {
-    method: 'POST',
-    body: formData
-  })
-  .then(function(response) {
-    return response.text();
-  })
-  .then(function(data) {
-    // Handle response from the server
-
-	console.log('test=>'+data);
-	//text.innerText=data.message;
-  	const filteredText = data.replace(/\[\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\]/, '');
-  text.innerText=filteredText;
-
-  })
-  .catch(function(error) {
-    console.error('Error:', error);
-  }).finally(() => {
-    // Perform an action while waiting for the response
+      })
+      .catch(function (error) {
+        console.error('Error:', error);
+      }).finally(() => {
+        // Perform an action while waiting for the response
 
 
-    console.log('Waiting for response...');
-  });
-function validateFileExtension(file, extension) {
+        console.log('Waiting for response...');
+      });
+    function validateFileExtension(file, extension) {
       const allowedExtensions = new RegExp(`.${extension}$`, 'i');
       return allowedExtensions.test(file.name);
     }
 
-});
+  });
 
-				</script>
+</script>

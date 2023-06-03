@@ -44,16 +44,16 @@ const upload = multer({ storage: storage });
 // Handle file upload
 app.post('/audiofile', upload.single('audioFile'), (req, res) => {
   const fileData = req.file.buffer; // Get the file data from the request
-  // Run the external program with file data
+  // Run the exte:wrnal program with file data
   const selectedFile = req.body.selectedFile;
-  console.log("selected file is"+selectedFile)
+  console.log("selected file is" + selectedFile)
   const command = './whisper.cpp/main';
-  const args = ['-f', '-','-m','./whisper.cpp/models/'+selectedFile]; // Use '-' to represent stdin as the file argument
+  const args = ['-f', '-', '-m', './whisper.cpp/models/' + selectedFile]; // Use '-' to represent stdin as the file argument
 
   // Create a child process
   //const child = spawn(command, args);
-  const child = spawn(command,args );
-let commandOutput = '';
+  const child = spawn(command, args);
+  let commandOutput = '';
 
   // Pass the file data to the stdin stream of the child process
   child.stdin.write(fileData);
@@ -62,7 +62,7 @@ let commandOutput = '';
   // Listen to the output of the external program
   child.stdout.on('data', (data) => {
 
-		   commandOutput += data; // Append the output data
+    commandOutput += data; // Append the output data
     console.log(`stdout: ${data}`);
   });
 
@@ -72,8 +72,8 @@ let commandOutput = '';
 
   child.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
-		  console.log(commandOutput.toString());
-		      res.send(commandOutput.toString());
+    console.log(commandOutput.toString());
+    res.send(commandOutput.toString());
 
   });
 
