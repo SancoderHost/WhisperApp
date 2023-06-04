@@ -48,7 +48,7 @@ app.post('/audiofile', upload.single('audioFile'), (req, res) => {
   const selectedFile = req.body.selectedFile;
   console.log("selected file is" + selectedFile)
   const command = './whisper.cpp/main';
-  const args = ['-f', '-', '-m', './whisper.cpp/models/' + selectedFile]; // Use '-' to represent stdin as the file argument
+  const args = ['-f', '-', '-m', './whisper.cpp/models/ggml-tiny.en.bin']; // Use '-' to represent stdin as the file argument
 
   // Create a child process
   //const child = spawn(command, args);
